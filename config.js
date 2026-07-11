@@ -51,8 +51,8 @@ const CONFIG_DISCORD = {
 // Agregá, quitá o editá entradas de esta lista según los canales que uses.
 // "nombre" es lo que se ve en el desplegable; "url" es el webhook real de Discord.
 const CONFIG_WEBHOOKS_PREDEFINIDOS = [
-  { nombre: "General",   url: "https://discord.com/api/webhooks/000000000000000000/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
-  { nombre: "Talleres",  url: "https://discord.com/api/webhooks/111111111111111111/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }
+  { nombre: "Reaver",   url: "https://discord.com/api/webhooks/1525622267239727104/cRbzGThOgJlbgOQIE-wcJ0jgobzUlg5i8-s3AAE8T2dh1gfQn-_MOoubdXvy6vM_0kuh" },
+  // { nombre: "Talleres",  url: "https://discord.com/api/webhooks/111111111111111111/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }
 ];
 
 const CONFIG_STORAGE_KEYS = {
