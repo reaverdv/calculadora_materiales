@@ -131,30 +131,42 @@ h1 span.accent { color: var(--cyan); }
   50% { opacity: 0.4; transform: scale(0.75); }
 }
 
-/* --- Tabla --- */
-table { width: 100%; border-collapse: collapse; }
-th, td {
-  padding: 16px 14px;
-  text-align: center;
-  font-size: 15px;
+/* --- Lista de materiales (filas tipo tarjeta) --- */
+.lista-cabecera {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 18px;
   border-bottom: 1px solid var(--border);
 }
-th {
+.lista-cabecera span {
   color: var(--muted);
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 10.5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
-tbody tr { transition: background 0.2s ease; }
-tbody tr:hover { background: rgba(255,45,94,0.05); }
-tbody tr:last-child td { border-bottom: none; }
-td.material {
-  text-align: left;
-  color: var(--text);
-  font-weight: 600;
+.lista-materiales { padding: 4px 0; }
+.fila-material {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
 }
-td.material .tag-custom {
+.fila-material:last-child { border-bottom: none; }
+.fila-material:hover { background: rgba(255,45,94,0.04); }
+
+.fila-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.fila-nombre {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 15px;
+}
+.fila-nombre .tag-custom {
   display: inline-block;
   font-size: 9px;
   font-weight: 700;
@@ -168,26 +180,55 @@ td.material .tag-custom {
   vertical-align: middle;
   text-transform: uppercase;
 }
-.subtotal {
+.fila-top-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.fila-subtotal {
   color: var(--cyan);
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
+.col-taller .fila-subtotal { color: var(--cyan-dim); }
 .del-row {
   background: transparent;
   border: 1px solid var(--danger);
   color: var(--danger);
-  width: 22px; height: 22px;
+  width: 24px; height: 24px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 .del-row:hover { background: var(--danger); color: #fff; }
 
+.fila-campo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.fila-campo:last-child { margin-bottom: 0; }
+.fila-label {
+  flex: 0 0 58px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.fila-campo-controles {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
 /* --- Inputs numéricos --- */
 input {
+
   font-family: 'Inter', sans-serif;
   color: var(--text);
   background: rgba(0,0,0,0.35);
@@ -201,7 +242,6 @@ input[type=number] { -moz-appearance: textfield; }
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  justify-content: center;
 }
 .chip-precio {
   border: 1px solid var(--border);
@@ -209,8 +249,8 @@ input[type=number] { -moz-appearance: textfield; }
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 13.5px;
-  padding: 8px 12px;
+  font-size: 13px;
+  padding: 7px 11px;
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -225,17 +265,16 @@ input[type=number] { -moz-appearance: textfield; }
 .precio-otro {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
-  margin-top: 8px;
   font-size: 11px;
   color: var(--muted);
   letter-spacing: 0.5px;
+  flex-shrink: 0;
 }
 .precio-otro input {
   border: 1px solid var(--border);
   border-radius: 6px;
-  width: 64px;
+  width: 58px;
   padding: 5px 4px;
   text-align: center;
   font-size: 12.5px;
@@ -252,16 +291,16 @@ input[type=number] { -moz-appearance: textfield; }
 .cant-wrap {
   display: flex;
   align-items: stretch;
-  justify-content: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 .cant-wrap input {
   border: 1px solid var(--border);
   border-radius: 8px;
-  width: 68px;
-  padding: 10px 4px;
+  width: 60px;
+  padding: 8px 4px;
   text-align: center;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   background: rgba(0,0,0,0.35);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -275,10 +314,10 @@ input[type=number] { -moz-appearance: textfield; }
   border: 1px solid var(--cyan);
   background: rgba(255,45,94,0.08);
   color: var(--cyan);
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -293,9 +332,8 @@ input[type=number] { -moz-appearance: textfield; }
 .qty-btn:active { transform: scale(0.92); }
 .qty-quick {
   display: flex;
-  justify-content: center;
   gap: 5px;
-  margin-top: 8px;
+  flex-shrink: 0;
 }
 .qty-quick button {
   border: 1px solid var(--border);
@@ -583,19 +621,11 @@ footer {
 .col-taller.panel::before { background: linear-gradient(90deg, var(--cyan-dim), var(--magenta)); }
 .col-taller .panel-head h2 { color: var(--text); }
 
-.columnas table { table-layout: fixed; }
-.columnas td.material {
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-.columnas .subtotal { font-size: 14px; }
-.columnas .del-row { width: 24px; height: 24px; font-size: 13px; }
-.columnas td.material .tag-custom { display: block; margin: 4px 0 0; width: fit-content; }
-
-@media (max-width: 520px) {
-  .columnas .chip-precio { font-size: 12px; padding: 6px 9px; }
-  .columnas .qty-btn { width: 36px; height: 36px; font-size: 20px; }
-  .columnas .cant-wrap input { width: 56px; font-size: 16px; }
+@media (max-width: 460px) {
+  .fila-label { flex-basis: 46px; font-size: 9px; }
+  .chip-precio { font-size: 12px; padding: 6px 9px; }
+  .qty-btn { width: 34px; height: 34px; font-size: 19px; }
+  .cant-wrap input { width: 52px; font-size: 15px; }
 }
 
 .cat-total {

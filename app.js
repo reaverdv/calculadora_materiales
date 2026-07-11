@@ -70,35 +70,46 @@ function crearChipsPrecio(catKey, i, precioActual) {
 }
 
 function crearFila(catKey, mat, i) {
-  const tr = document.createElement('tr');
+  const div = document.createElement('div');
+  div.className = 'fila-material';
   const idPrecio = `precio-${catKey}-${i}`;
   const idCant = `cant-${catKey}-${i}`;
   const idSub = `sub-${catKey}-${i}`;
-  tr.innerHTML = `
-    <td class="material">${mat.nombre}${mat.personalizado ? '<span class="tag-custom">NUEVO</span>' : ''}</td>
-    <td>
-      ${crearChipsPrecio(catKey, i, mat.precioInicial)}
-      <div class="precio-otro">
-        <span>Otro:</span>
-        <input type="number" step="0.5" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular(); registrarCambioValor('${idPrecio}'); guardarPersonalizados('${catKey}'); actualizarChipsActivos('${catKey}', ${i})">
+  div.innerHTML = `
+    <div class="fila-top">
+      <div class="fila-nombre">${mat.nombre}${mat.personalizado ? '<span class="tag-custom">NUEVO</span>' : ''}</div>
+      <div class="fila-top-right">
+        <span class="fila-subtotal" id="${idSub}">$0.00</span>
+        ${mat.personalizado ? `<button class="del-row" onclick="eliminarMaterial('${catKey}', ${i})">✕</button>` : ''}
       </div>
-    </td>
-    <td>
-      <div class="cant-wrap">
-        <button type="button" class="qty-btn qty-minus" onclick="cambiar('${idCant}', -1, '${catKey}')" aria-label="Restar uno">−</button>
-        <input type="number" step="1" min="0" value="0" id="${idCant}" onchange="calcular(); registrarCambioValor('${idCant}')">
-        <button type="button" class="qty-btn qty-plus" onclick="cambiar('${idCant}', 1, '${catKey}')" aria-label="Sumar uno">+</button>
+    </div>
+    <div class="fila-campo">
+      <span class="fila-label">Precio</span>
+      <div class="fila-campo-controles">
+        ${crearChipsPrecio(catKey, i, mat.precioInicial)}
+        <div class="precio-otro">
+          <span>Otro:</span>
+          <input type="number" step="0.5" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular(); registrarCambioValor('${idPrecio}'); guardarPersonalizados('${catKey}'); actualizarChipsActivos('${catKey}', ${i})">
+        </div>
       </div>
-      <div class="qty-quick">
-        <button type="button" onclick="cambiar('${idCant}', 5, '${catKey}')">+5</button>
-        <button type="button" onclick="cambiar('${idCant}', 10, '${catKey}')">+10</button>
-        <button type="button" onclick="cambiar('${idCant}', 25, '${catKey}')">+25</button>
+    </div>
+    <div class="fila-campo">
+      <span class="fila-label">Cantidad</span>
+      <div class="fila-campo-controles">
+        <div class="cant-wrap">
+          <button type="button" class="qty-btn qty-minus" onclick="cambiar('${idCant}', -1, '${catKey}')" aria-label="Restar uno">−</button>
+          <input type="number" step="1" min="0" value="0" id="${idCant}" onchange="calcular(); registrarCambioValor('${idCant}')">
+          <button type="button" class="qty-btn qty-plus" onclick="cambiar('${idCant}', 1, '${catKey}')" aria-label="Sumar uno">+</button>
+        </div>
+        <div class="qty-quick">
+          <button type="button" onclick="cambiar('${idCant}', 5, '${catKey}')">+5</button>
+          <button type="button" onclick="cambiar('${idCant}', 10, '${catKey}')">+10</button>
+          <button type="button" onclick="cambiar('${idCant}', 25, '${catKey}')">+25</button>
+        </div>
       </div>
-    </td>
-    <td class="subtotal" id="${idSub}">$0.00</td>
-    <td>${mat.personalizado ? `<button class="del-row" onclick="eliminarMaterial('${catKey}', ${i})">✕</button>` : ''}</td>
+    </div>
   `;
-  return tr;
+  return div;
 }
 
 function setPrecio(catKey, i, valor) {
