@@ -11,6 +11,11 @@
   --border: #261e21;
   --danger: #ff3b30;
   --ok: #35d488;
+
+  /* Cursores personalizados en rosa con relieve (SVG en base64) */
+  --cursor-default: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjhhYTgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiNmZjJkNWUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYjgwMDNhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0icyIgeD0iLTUwJSIgeT0iLTUwJSIgd2lkdGg9IjIwMCUiIGhlaWdodD0iMjAwJSI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjEiIGR5PSIxLjUiIHN0ZERldmlhdGlvbj0iMSIgZmxvb2QtY29sb3I9IiMxYTAwMDgiIGZsb29kLW9wYWNpdHk9IjAuNjUiLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8cGF0aCBmaWx0ZXI9InVybCgjcykiIGQ9Ik00IDIgTDQgMjcgTDEwLjIgMjEuMyBMMTQuNCAyOS42IEwxOC4zIDI3LjcgTDE0LjIgMTkuNiBMMjIgMTkuNiBaIgogICAgICAgIGZpbGw9InVybCgjZykiIHN0cm9rZT0iIzNhMDAxNCIgc3Ryb2tlLXdpZHRoPSIxLjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNS40IDQuOCBMNS40IDIwLjIgTDkuNiAxNi43IEwxMC42IDE2LjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZTFlOSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuNiIvPgo8L3N2Zz4K");
+  --cursor-pointer: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZmIwYzQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiNmZjJkNWUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYjgwMDNhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0icyIgeD0iLTUwJSIgeT0iLTUwJSIgd2lkdGg9IjIwMCUiIGhlaWdodD0iMjAwJSI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjEiIGR5PSIxLjUiIHN0ZERldmlhdGlvbj0iMS4yIiBmbG9vZC1jb2xvcj0iIzFhMDAwOCIgZmxvb2Qtb3BhY2l0eT0iMC43Ii8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPHBhdGggZmlsdGVyPSJ1cmwoI3MpIiBkPSJNNCAyIEw0IDI3IEwxMC4yIDIxLjMgTDE0LjQgMjkuNiBMMTguMyAyNy43IEwxNC4yIDE5LjYgTDIyIDE5LjYgWiIKICAgICAgICBmaWxsPSJ1cmwoI2cpIiBzdHJva2U9IiMzYTAwMTQiIHN0cm9rZS13aWR0aD0iMS4zIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTUuNCA0LjggTDUuNCAyMC4yIEw5LjYgMTYuNyBMMTAuNiAxNi4zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmUxZTkiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjY1Ii8+CiAgPHJlY3QgeD0iMjAiIHk9IjIxIiB3aWR0aD0iNi40IiBoZWlnaHQ9IjYuNCIgcng9IjEuMyIgdHJhbnNmb3JtPSJyb3RhdGUoNDUgMjMuMiAyNC4yKSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmY2YjhhIiBzdHJva2Utd2lkdGg9IjEuNiIvPgo8L3N2Zz4K");
+  --cursor-text: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDE2IDI4Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjhhYTgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYjgwMDNhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0icyIgeD0iLTUwJSIgeT0iLTUwJSIgd2lkdGg9IjIwMCUiIGhlaWdodD0iMjAwJSI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjAuNiIgZHk9IjEiIHN0ZERldmlhdGlvbj0iMC44IiBmbG9vZC1jb2xvcj0iIzFhMDAwOCIgZmxvb2Qtb3BhY2l0eT0iMC42Ii8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPHBhdGggZmlsdGVyPSJ1cmwoI3MpIiBkPSJNNCAyIEgxMiBWNSBIOS40IFYyMyBIMTIgVjI2IEg0IFYyMyBINi42IFY1IEg0IFoiCiAgICAgICAgZmlsbD0idXJsKCNnKSIgc3Ryb2tlPSIjM2EwMDE0IiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==");
 }
 * { box-sizing: border-box; }
 @media (prefers-reduced-motion: reduce) {
@@ -23,11 +28,27 @@ html, body {
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-size: 14px;
+  cursor: var(--cursor-default), auto;
 }
 body {
   padding: 22px 16px 50px;
   position: relative;
   overflow-x: hidden;
+}
+
+/* --- Cursores personalizados --- */
+a, button, .btn, select,
+.chip-precio, .qty-btn, .qty-quick button,
+.del-row, .modal-close, .toggle-visibility,
+input[type="checkbox"], input[type="radio"],
+[onclick] {
+  cursor: var(--cursor-pointer), pointer;
+}
+input[type="text"], input[type="number"], input[type="password"], textarea {
+  cursor: var(--cursor-text), text;
+}
+button:disabled, .btn:disabled {
+  cursor: var(--cursor-default), not-allowed;
 }
 /* Resplandor ambiental (como el glow rojo/rosa de fondo de Origen) */
 body::after {
@@ -712,7 +733,25 @@ footer {
   margin-bottom: 20px;
 }
 .acciones-fila .btn-ghost { margin: 0; }
-.btn-ghost-danger:hover { border-color: var(--danger); color: var(--danger); }
+.btn-pill-solid {
+  display: inline-block;
+  margin: 0;
+  background: var(--cyan);
+  border: 1px solid var(--cyan);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 1.2px;
+  font-weight: 800;
+  box-shadow: 0 0 12px rgba(255,45,94,0.4);
+}
+.btn-pill-solid:hover {
+  background: #ff4972;
+  box-shadow: 0 0 20px rgba(255,45,94,0.6);
+}
+.btn-pill-solid:active { transform: scale(0.97); }
 
 /* --- Textareas para JSON --- */
 .modal-texto {
