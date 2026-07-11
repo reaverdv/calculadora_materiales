@@ -140,6 +140,7 @@ function agregarMaterial() {
   categorias[catKey].materiales.push({ nombre, personalizado: true, precioInicial: precio });
   renderTodo();
   guardarPersonalizados(catKey);
+  logConsola(`+ material añadido: "${nombre}" (${etiquetasCategoria[catKey]}) — $${precio.toFixed(2)}`, 'info');
 
   nombreInput.value = '';
   precioInput.value = categorias[catKey].precioBase;
@@ -148,10 +149,12 @@ function agregarMaterial() {
 
 function eliminarMaterial(catKey, i) {
   const cat = categorias[catKey];
+  const nombre = cat.materiales[i]?.nombre;
   cat.materiales[i] = null;
   cat.materiales = cat.materiales.filter(m => m !== null);
   renderTodo();
   guardarPersonalizados(catKey);
+  logConsola(`- material eliminado: "${nombre}"`, 'err');
 }
 
 // ---------- Cálculo ----------
@@ -196,6 +199,7 @@ function resetear() {
     });
   });
   calcular();
+  logConsola('↺ cantidades restablecidas a cero.');
 }
 
 // ---------- Discord ----------
@@ -235,6 +239,7 @@ async function registrarEnDiscord() {
 
   if (!url) {
     mostrarEstado('⚠ Poné la URL del webhook primero.', 'err');
+    logConsola('⚠ falta configurar la URL del webhook.', 'err');
     return;
   }
 
@@ -269,6 +274,7 @@ async function registrarEnDiscord() {
 
   if (embeds.length === 0) {
     mostrarEstado('⚠ No hay cantidades cargadas para registrar.', 'err');
+    logConsola('⚠ no hay cantidades cargadas, transmisión cancelada.', 'err');
     return;
   }
 
@@ -284,6 +290,7 @@ async function registrarEnDiscord() {
   const btn = document.getElementById('btn-registrar');
   btn.disabled = true;
   mostrarEstado('▸ transmitiendo...', 'loading');
+  logConsola('▸ transmitiendo registro a Discord...', 'info');
 
   try {
     const res = await fetch(url, {
@@ -293,11 +300,14 @@ async function registrarEnDiscord() {
     });
     if (res.ok) {
       mostrarEstado('✔ registrado correctamente en discord.', 'ok');
+      logConsola(`✔ registro enviado — total $${total.toFixed(2)}.`);
     } else {
       mostrarEstado(`✕ discord respondió con error (${res.status}). revisá la url.`, 'err');
+      logConsola(`✕ discord respondió con error ${res.status}.`, 'err');
     }
   } catch (e) {
     mostrarEstado('✕ no se pudo conectar. revisá la url o tu conexión.', 'err');
+    logConsola('✕ fallo de conexión al enviar a discord.', 'err');
   } finally {
     btn.disabled = false;
   }
@@ -317,8 +327,57 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') cerrarModal();
 });
 
+// ---------- Consola del sistema ----------
+const consolaEl = document.getElementById('consola-output');
+function logConsola(mensaje, tipo = '') {
+  if (!consolaEl) return;
+  const hora = new Date().toLocaleTimeString('es-ES', { hour12: false });
+  const linea = document.createElement('div');
+  linea.className = `linea ${tipo}`;
+  linea.innerHTML = `<span class="marca-tiempo">[${hora}]</span>${mensaje}`;
+  consolaEl.appendChild(linea);
+  consolaEl.scrollTop = consolaEl.scrollHeight;
+}
+
+// ---------- Bloqueo de clic derecho ----------
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  logConsola('⚠ intento de clic derecho bloqueado.', 'err');
+});
+
+// ---------- Cursor personalizado: llave inglesa ----------
+function inicializarCursor() {
+  if (window.matchMedia('(pointer: coarse)').matches) return; // sin cursor custom en táctil
+
+  const cursor = document.createElement('div');
+  cursor.id = 'custom-cursor';
+  cursor.textContent = '🔧';
+  document.body.appendChild(cursor);
+
+  document.addEventListener('mousemove', (e) => {
+    cursor.style.left = `${e.clientX}px`;
+    cursor.style.top = `${e.clientY}px`;
+  });
+
+  const selectorInteractivo = 'button, a, input, select, .btn, [onclick]';
+
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(selectorInteractivo)) {
+      cursor.classList.add('activo');
+    }
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(selectorInteractivo)) {
+      cursor.classList.remove('activo');
+    }
+  });
+}
+
 // ---------- Inicialización ----------
 document.addEventListener('DOMContentLoaded', () => {
   renderTodo();
   inicializarDiscord();
+  inicializarCursor();
+  logConsola('sistema REAVER MATERIALES iniciado.');
+  logConsola('inventario cargado correctamente.');
 });

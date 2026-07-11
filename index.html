@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAT//CALC — Terminal de Tasación</title>
+<title>Reaver Materiales — Terminal de Tasación</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -13,8 +13,8 @@
 
   <header>
     <div class="eyebrow">SISTEMA DE TASACIÓN DE CHATARRA</div>
-    <h1>MAT // CALC</h1>
-    <div class="subtitle">&gt; escaneando inventario de materiales<span class="cursor"></span></div>
+    <h1>REAVER <span class="accent">MATERIALES</span></h1>
+    <div class="subtitle">&gt; escaneando inventario de materiales<span class="blink-cursor"></span></div>
     <button class="btn btn-config" onclick="abrirModal()">⚙ CONFIGURACIÓN</button>
   </header>
 
@@ -98,7 +98,23 @@
     </div>
   </div>
 
-  <footer>MAT//CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Consola del sistema</h2>
+      <span class="dot" style="background:var(--ok); box-shadow:0 0 8px var(--ok);"></span>
+    </div>
+    <div class="console-box">
+      <div class="console-topbar">
+        <span class="console-dot red"></span>
+        <span class="console-dot yellow"></span>
+        <span class="console-dot green"></span>
+        <span class="console-path">root@reaver:~$</span>
+      </div>
+      <div class="console-output" id="consola-output"></div>
+    </div>
+  </div>
+
+  <footer>REAVER MATERIALES — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
 </div>
 
 <!-- ---------- Modal de configuración ---------- -->
