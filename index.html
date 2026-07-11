@@ -18,66 +18,74 @@
     <button class="btn btn-config" onclick="abrirModal()">⚙ CONFIGURACIÓN</button>
   </header>
 
-  <div class="columnas">
+  <div class="layout-principal">
 
-    <div class="panel col-general">
+    <div class="col-principal">
+      <div class="columnas">
+
+        <div class="panel col-general">
+          <div class="panel-head">
+            <h2>Inventario general</h2>
+            <span class="dot"></span>
+          </div>
+          <div class="lista-cabecera"><span>Subtotal</span></div>
+          <div class="lista-materiales" id="tabla-general"></div>
+          <div class="cat-total">
+            <span class="label">Subtotal general</span>
+            <span class="value" id="subtotal-general">$0.00</span>
+          </div>
+        </div>
+
+        <div class="panel col-taller">
+          <div class="panel-head">
+            <h2>Materiales de talleres</h2>
+            <span class="dot" style="background:var(--cyan-dim); box-shadow:0 0 8px var(--cyan-dim);"></span>
+          </div>
+          <div class="lista-cabecera"><span>Subtotal</span></div>
+          <div class="lista-materiales" id="tabla-taller"></div>
+          <div class="cat-total">
+            <span class="label">Subtotal talleres</span>
+            <span class="value" id="subtotal-taller">$0.00</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="total-box">
+          <span class="label">Total combinado</span>
+          <span class="value" id="total">$0.00</span>
+        </div>
+      </div>
+
+      <div class="acciones-fila">
+        <button class="btn btn-ghost" onclick="resetear()">↺ Restablecer cantidades</button>
+        <button class="btn btn-ghost" onclick="abrirModalPlantilla()">🧾 Plantilla JSON</button>
+        <button class="btn btn-ghost" onclick="abrirModalImportar()">📥 Importar JSON</button>
+      </div>
+
+      <div class="panel">
+        <div class="config-body">
+          <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
+          <div class="status-msg" id="status-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel panel-resumen">
       <div class="panel-head">
-        <h2>Inventario general</h2>
-        <span class="dot"></span>
+        <h2>Resumen en vivo</h2>
+        <span class="dot" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>
       </div>
-      <div class="lista-cabecera"><span>Subtotal</span></div>
-      <div class="lista-materiales" id="tabla-general"></div>
+      <div class="resumen-lista" id="lista-resumen">
+        <div class="resumen-vacio">Sin materiales cargados aún.</div>
+      </div>
       <div class="cat-total">
-        <span class="label">Subtotal general</span>
-        <span class="value" id="subtotal-general">$0.00</span>
+        <span class="label">Total en vivo</span>
+        <span class="value" id="resumen-total">$0.00</span>
       </div>
-    </div>
+    </aside>
 
-    <div class="panel col-taller">
-      <div class="panel-head">
-        <h2>Materiales de talleres</h2>
-        <span class="dot" style="background:var(--cyan-dim); box-shadow:0 0 8px var(--cyan-dim);"></span>
-      </div>
-      <div class="lista-cabecera"><span>Subtotal</span></div>
-      <div class="lista-materiales" id="tabla-taller"></div>
-      <div class="cat-total">
-        <span class="label">Subtotal talleres</span>
-        <span class="value" id="subtotal-taller">$0.00</span>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="panel">
-    <div class="total-box">
-      <span class="label">Total combinado</span>
-      <span class="value" id="total">$0.00</span>
-    </div>
-  </div>
-
-  <button class="btn btn-ghost" onclick="resetear()" style="margin-bottom: 20px;">↺ Restablecer cantidades</button>
-
-  <div class="panel">
-    <div class="config-body">
-      <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
-      <div class="status-msg" id="status-msg"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Consola del sistema</h2>
-      <span class="dot" style="background:var(--ok); box-shadow:0 0 8px var(--ok);"></span>
-    </div>
-    <div class="console-box">
-      <div class="console-topbar">
-        <span class="console-dot red"></span>
-        <span class="console-dot yellow"></span>
-        <span class="console-dot green"></span>
-        <span class="console-path">root@reaver:~$</span>
-      </div>
-      <div class="console-output" id="consola-output"></div>
-    </div>
   </div>
 
   <footer>REAVER MATERIALES — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
@@ -135,6 +143,65 @@
         </div>
       </div>
 
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Consola del sistema</h2>
+          <span class="dot" style="background:var(--ok); box-shadow:0 0 8px var(--ok);"></span>
+        </div>
+        <div class="console-box">
+          <div class="console-topbar">
+            <span class="console-dot red"></span>
+            <span class="console-dot yellow"></span>
+            <span class="console-dot green"></span>
+            <span class="console-path">root@reaver:~$</span>
+          </div>
+          <div class="console-output" id="consola-output"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Modal de plantilla JSON ---------- -->
+<div class="modal-overlay" id="modal-plantilla-overlay" onclick="cerrarModalFondoGenerico(event, 'modal-plantilla-overlay')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>🧾 Plantilla JSON</h2>
+      <button class="modal-close" onclick="cerrarModalOverlay('modal-plantilla-overlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="panel">
+        <div class="config-body">
+          <p class="modal-texto">Copiá este JSON, completá las cantidades de cada material y después usá "Importar JSON" para cargarlas automáticamente en la tabla.</p>
+          <textarea id="texto-plantilla" class="json-textarea" readonly></textarea>
+          <button class="btn btn-neon" onclick="copiarPlantilla()">⧉ Copiar al portapapeles</button>
+          <div class="status-msg" id="status-plantilla"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Modal de importación JSON ---------- -->
+<div class="modal-overlay" id="modal-importar-overlay" onclick="cerrarModalFondoGenerico(event, 'modal-importar-overlay')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>📥 Importar JSON</h2>
+      <button class="modal-close" onclick="cerrarModalOverlay('modal-importar-overlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="panel">
+        <div class="config-body">
+          <p class="modal-texto">Pegá acá el JSON con las cantidades ya completadas. Los materiales se identifican por su nombre exacto.</p>
+          <textarea id="texto-importar" class="json-textarea" placeholder='{
+  "general": { "Goma": 5, "Cobre": 12 },
+  "taller": { "Hierro": 3 }
+}'></textarea>
+          <button class="btn btn-neon btn-magenta" onclick="aplicarJSONImportado()">▲ Aplicar cantidades</button>
+          <div class="status-msg" id="status-importar"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

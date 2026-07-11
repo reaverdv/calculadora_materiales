@@ -243,6 +243,49 @@ function calcular() {
     if (subtotalCatEl) subtotalCatEl.textContent = `$${subtotalCategoria.toFixed(2)}`;
   });
   document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+  actualizarResumen();
+}
+
+// ---------- Resumen en vivo (columna lateral) ----------
+function actualizarResumen() {
+  const contenedor = document.getElementById('lista-resumen');
+  const totalEl = document.getElementById('resumen-total');
+  if (!contenedor) return;
+
+  const items = [];
+  let total = 0;
+
+  Object.keys(categorias).forEach(catKey => {
+    const cat = categorias[catKey];
+    cat.materiales.forEach((mat, i) => {
+      const precioEl = document.getElementById(`precio-${catKey}-${i}`);
+      const cantEl = document.getElementById(`cant-${catKey}-${i}`);
+      if (!precioEl || !cantEl) return;
+      const precio = parseFloat(precioEl.value) || 0;
+      const cantidad = parseFloat(cantEl.value) || 0;
+      if (cantidad > 0) {
+        const subtotal = precio * cantidad;
+        total += subtotal;
+        items.push({ catKey, nombre: mat.nombre, cantidad, subtotal });
+      }
+    });
+  });
+
+  if (items.length === 0) {
+    contenedor.innerHTML = '<div class="resumen-vacio">Sin materiales cargados aún.</div>';
+  } else {
+    contenedor.innerHTML = items.map(it => `
+      <div class="resumen-item ${it.catKey}">
+        <div>
+          <span class="nombre">${it.nombre}</span>
+          <span class="cat-badge">${etiquetasCategoria[it.catKey] || it.catKey}</span>
+        </div>
+        <span class="cant">${it.cantidad} · $${it.subtotal.toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+
+  if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
 }
 
 function resetear() {
@@ -378,9 +421,145 @@ function cerrarModal() {
 function cerrarModalFondo(evento) {
   if (evento.target.id === 'modal-overlay') cerrarModal();
 }
+
+// ---------- Modales genéricos (plantilla JSON / importar JSON) ----------
+const IDS_MODALES = ['modal-overlay', 'modal-plantilla-overlay', 'modal-importar-overlay'];
+
+function abrirModalOverlay(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('abierto');
+}
+function cerrarModalOverlay(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('abierto');
+}
+function cerrarModalFondoGenerico(evento, id) {
+  if (evento.target.id === id) cerrarModalOverlay(id);
+}
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') cerrarModal();
+  if (e.key === 'Escape') IDS_MODALES.forEach(cerrarModalOverlay);
 });
+
+// ---------- Plantilla JSON (exportar / importar cantidades) ----------
+function construirDatosJSON() {
+  const datos = {};
+  Object.keys(categorias).forEach(catKey => {
+    const cat = categorias[catKey];
+    datos[catKey] = {};
+    cat.materiales.forEach((mat, i) => {
+      const cantEl = document.getElementById(`cant-${catKey}-${i}`);
+      const cantidad = cantEl ? (parseFloat(cantEl.value) || 0) : 0;
+      datos[catKey][mat.nombre] = cantidad;
+    });
+  });
+  return datos;
+}
+
+function abrirModalPlantilla() {
+  const datos = construirDatosJSON();
+  const textarea = document.getElementById('texto-plantilla');
+  textarea.value = JSON.stringify(datos, null, 2);
+  const status = document.getElementById('status-plantilla');
+  status.textContent = '';
+  status.className = 'status-msg';
+  abrirModalOverlay('modal-plantilla-overlay');
+  logConsola('🧾 plantilla JSON generada con los materiales actuales.', 'info');
+}
+
+async function copiarPlantilla() {
+  const textarea = document.getElementById('texto-plantilla');
+  const status = document.getElementById('status-plantilla');
+  textarea.focus();
+  textarea.select();
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(textarea.value);
+    } else {
+      document.execCommand('copy');
+    }
+    status.textContent = '✔ copiado al portapapeles.';
+    status.className = 'status-msg ok';
+    logConsola('✔ plantilla JSON copiada al portapapeles.');
+  } catch (e) {
+    status.textContent = '✕ no se pudo copiar. seleccioná el texto y copiá manualmente.';
+    status.className = 'status-msg err';
+    logConsola('✕ fallo al copiar la plantilla JSON.', 'err');
+  }
+}
+
+function abrirModalImportar() {
+  document.getElementById('texto-importar').value = '';
+  const status = document.getElementById('status-importar');
+  status.textContent = '';
+  status.className = 'status-msg';
+  abrirModalOverlay('modal-importar-overlay');
+}
+
+function aplicarJSONImportado() {
+  const textarea = document.getElementById('texto-importar');
+  const status = document.getElementById('status-importar');
+  let datos;
+
+  try {
+    datos = JSON.parse(textarea.value);
+  } catch (e) {
+    status.textContent = '✕ JSON inválido. revisá el formato.';
+    status.className = 'status-msg err';
+    logConsola('✕ importación fallida: el JSON no es válido.', 'err');
+    return;
+  }
+
+  if (typeof datos !== 'object' || datos === null) {
+    status.textContent = '✕ el JSON debe ser un objeto con las categorías.';
+    status.className = 'status-msg err';
+    logConsola('✕ importación fallida: formato inesperado.', 'err');
+    return;
+  }
+
+  let aplicados = 0;
+  const noEncontrados = [];
+
+  Object.keys(datos).forEach(catKey => {
+    const cat = categorias[catKey];
+    const seccion = datos[catKey];
+    if (!cat || typeof seccion !== 'object' || seccion === null) return;
+
+    Object.keys(seccion).forEach(nombreMat => {
+      const valor = parseFloat(seccion[nombreMat]);
+      if (isNaN(valor)) return;
+
+      const i = cat.materiales.findIndex(
+        m => m.nombre.trim().toLowerCase() === nombreMat.trim().toLowerCase()
+      );
+      if (i === -1) {
+        noEncontrados.push(nombreMat);
+        return;
+      }
+
+      const cantEl = document.getElementById(`cant-${catKey}-${i}`);
+      if (cantEl) {
+        cantEl.value = valor < 0 ? 0 : valor;
+        aplicados++;
+      }
+    });
+  });
+
+  calcular();
+
+  if (aplicados > 0) {
+    status.textContent = `✔ ${aplicados} material(es) actualizados.` +
+      (noEncontrados.length ? ` (${noEncontrados.length} sin coincidencia)` : '');
+    status.className = 'status-msg ok';
+    logConsola(`✔ JSON importado — ${aplicados} cantidades actualizadas.`);
+    if (noEncontrados.length) {
+      logConsola(`⚠ materiales no reconocidos al importar: ${noEncontrados.join(', ')}`, 'err');
+    }
+  } else {
+    status.textContent = '⚠ no se encontraron materiales coincidentes en el JSON.';
+    status.className = 'status-msg err';
+    logConsola('⚠ importación sin coincidencias — revisá los nombres.', 'err');
+  }
+}
 
 // ---------- Consola del sistema (con historial persistente) ----------
 const consolaEl = document.getElementById('consola-output');
