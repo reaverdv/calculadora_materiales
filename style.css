@@ -544,6 +544,27 @@ input[type=number] { -moz-appearance: textfield; }
   font-size: 13px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.field-row select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(0,0,0,0.35);
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  appearance: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-row select:focus {
+  outline: none;
+  border-color: var(--magenta);
+  box-shadow: 0 0 8px rgba(255,15,76,0.35);
+}
+.field-row input[readonly] {
+  opacity: 0.6;
+  cursor: var(--cursor-default), default;
+}
 .field-row input:focus {
   outline: none;
   border-color: var(--magenta);

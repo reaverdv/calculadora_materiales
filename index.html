@@ -133,6 +133,12 @@
         </div>
         <div class="config-body">
           <div class="field-row">
+            <label for="webhook-select">Webhook de destino</label>
+            <select id="webhook-select" onchange="cambiarWebhookSeleccionado()">
+              <option value="custom">✎ Personalizado (pegar URL)</option>
+            </select>
+          </div>
+          <div class="field-row">
             <label for="webhook-url">URL del webhook</label>
             <input type="password" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
             <button type="button" class="toggle-visibility" onclick="alternarVisibilidad()">Mostrar</button>

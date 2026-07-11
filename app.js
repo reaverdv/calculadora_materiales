@@ -359,12 +359,48 @@ function limpiarTablas() {
 
 // ---------- Discord ----------
 const webhookInput = document.getElementById('webhook-url');
+const webhookSelect = document.getElementById('webhook-select');
 const nombreUsuarioInput = document.getElementById('nombre-usuario');
 
+function poblarSelectWebhooks() {
+  CONFIG_WEBHOOKS_PREDEFINIDOS.forEach((wh, i) => {
+    const opt = document.createElement('option');
+    opt.value = `predef-${i}`;
+    opt.textContent = wh.nombre;
+    webhookSelect.appendChild(opt);
+  });
+}
+
+function cambiarWebhookSeleccionado() {
+  const valor = webhookSelect.value;
+  guardar(CONFIG_STORAGE_KEYS.webhookSeleccionado, valor);
+
+  if (valor === 'custom') {
+    webhookInput.readOnly = false;
+    webhookInput.placeholder = 'https://discord.com/api/webhooks/...';
+    webhookInput.value = leer(CONFIG_STORAGE_KEYS.webhookUrl) || '';
+  } else {
+    const idx = parseInt(valor.replace('predef-', ''), 10);
+    const wh = CONFIG_WEBHOOKS_PREDEFINIDOS[idx];
+    webhookInput.value = wh ? wh.url : '';
+    webhookInput.readOnly = true;
+  }
+}
+
 function inicializarDiscord() {
-  webhookInput.value = leer(CONFIG_STORAGE_KEYS.webhookUrl) || '';
+  poblarSelectWebhooks();
+
+  const seleccionGuardada = leer(CONFIG_STORAGE_KEYS.webhookSeleccionado) || 'custom';
+  const opcionValida = Array.from(webhookSelect.options).some(o => o.value === seleccionGuardada);
+  webhookSelect.value = opcionValida ? seleccionGuardada : 'custom';
+  cambiarWebhookSeleccionado();
+
   nombreUsuarioInput.value = leer(CONFIG_STORAGE_KEYS.nombreUsuario) || '';
-  webhookInput.addEventListener('change', () => guardar(CONFIG_STORAGE_KEYS.webhookUrl, webhookInput.value.trim()));
+
+  webhookInput.addEventListener('change', () => {
+    if (webhookInput.readOnly) return; // los predefinidos no se editan ni se guardan como "custom"
+    guardar(CONFIG_STORAGE_KEYS.webhookUrl, webhookInput.value.trim());
+  });
   nombreUsuarioInput.addEventListener('change', () => guardar(CONFIG_STORAGE_KEYS.nombreUsuario, nombreUsuarioInput.value.trim()));
 }
 
@@ -389,11 +425,13 @@ const etiquetasCategoria = { general: 'Inventario general', taller: 'Materiales 
 
 async function registrarEnDiscord() {
   const url = webhookInput.value.trim();
-  guardar(CONFIG_STORAGE_KEYS.webhookUrl, url);
+  if (webhookSelect.value === 'custom') {
+    guardar(CONFIG_STORAGE_KEYS.webhookUrl, url);
+  }
   guardar(CONFIG_STORAGE_KEYS.nombreUsuario, nombreUsuarioInput.value.trim());
 
   if (!url) {
-    mostrarEstado('⚠ Poné la URL del webhook primero.', 'err');
+    mostrarEstado('⚠ Poné o elegí la URL del webhook primero.', 'err');
     logConsola('⚠ falta configurar la URL del webhook.', 'err');
     return;
   }

@@ -47,12 +47,21 @@ const CONFIG_DISCORD = {
   colorEmbed: 65522 // color de la barra lateral del embed en Discord
 };
 
+// Webhooks predefinidos que aparecen en el selector del panel de Discord.
+// Agregá, quitá o editá entradas de esta lista según los canales que uses.
+// "nombre" es lo que se ve en el desplegable; "url" es el webhook real de Discord.
+const CONFIG_WEBHOOKS_PREDEFINIDOS = [
+  { nombre: "General",   url: "https://discord.com/api/webhooks/000000000000000000/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
+  { nombre: "Talleres",  url: "https://discord.com/api/webhooks/111111111111111111/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" }
+];
+
 const CONFIG_STORAGE_KEYS = {
   personalizadosGeneral: "materiales-personalizados-general",
   personalizadosTaller: "materiales-personalizados-taller",
   estadoGeneral: "materiales-estado-general",
   estadoTaller: "materiales-estado-taller",
   webhookUrl: "discord-webhook-url",
+  webhookSeleccionado: "discord-webhook-seleccionado",
   nombreUsuario: "discord-nombre-usuario",
   consolaHistorial: "consola-historial"
 };
