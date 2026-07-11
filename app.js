@@ -168,6 +168,7 @@ function calcular() {
   let total = 0;
   Object.keys(categorias).forEach(catKey => {
     const cat = categorias[catKey];
+    let subtotalCategoria = 0;
     cat.materiales.forEach((_, i) => {
       const precioEl = document.getElementById(`precio-${catKey}-${i}`);
       const cantEl = document.getElementById(`cant-${catKey}-${i}`);
@@ -175,10 +176,13 @@ function calcular() {
       const precio = parseFloat(precioEl.value) || 0;
       const cantidad = parseFloat(cantEl.value) || 0;
       const subtotal = precio * cantidad;
+      subtotalCategoria += subtotal;
       total += subtotal;
       const subEl = document.getElementById(`sub-${catKey}-${i}`);
       if (subEl) subEl.textContent = `$${subtotal.toFixed(2)}`;
     });
+    const subtotalCatEl = document.getElementById(`subtotal-${catKey}`);
+    if (subtotalCatEl) subtotalCatEl.textContent = `$${subtotalCategoria.toFixed(2)}`;
   });
   document.getElementById('total').textContent = `$${total.toFixed(2)}`;
 }
@@ -298,6 +302,20 @@ async function registrarEnDiscord() {
     btn.disabled = false;
   }
 }
+
+// ---------- Modal de configuración ----------
+function abrirModal() {
+  document.getElementById('modal-overlay').classList.add('abierto');
+}
+function cerrarModal() {
+  document.getElementById('modal-overlay').classList.remove('abierto');
+}
+function cerrarModalFondo(evento) {
+  if (evento.target.id === 'modal-overlay') cerrarModal();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') cerrarModal();
+});
 
 // ---------- Inicialización ----------
 document.addEventListener('DOMContentLoaded', () => {

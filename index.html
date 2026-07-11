@@ -16,101 +16,127 @@
     <div class="eyebrow">SISTEMA DE TASACIÓN DE CHATARRA</div>
     <h1>MAT // CALC</h1>
     <div class="subtitle">&gt; escaneando inventario de materiales<span class="cursor"></span></div>
+    <button class="btn btn-config" onclick="abrirModal()">⚙ CONFIGURACIÓN</button>
   </header>
 
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Inventario general</h2>
-      <span class="dot"></span>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th style="text-align:left;">Material</th>
-          <th>Precio</th>
-          <th>Cant.</th>
-          <th>Subtotal</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tabla-general"></tbody>
-    </table>
-  </div>
+  <div class="columnas">
 
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Materiales de talleres</h2>
-      <span class="dot" style="background:var(--cyan-dim); box-shadow:0 0 8px var(--cyan-dim);"></span>
+    <div class="panel col-general">
+      <div class="panel-head">
+        <h2>Inventario general</h2>
+        <span class="dot"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;">Material</th>
+            <th>Precio</th>
+            <th>Cant.</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tabla-general"></tbody>
+      </table>
+      <div class="cat-total">
+        <span class="label">Subtotal general</span>
+        <span class="value" id="subtotal-general">$0.00</span>
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th style="text-align:left;">Material</th>
-          <th>Precio</th>
-          <th>Cant.</th>
-          <th>Subtotal</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tabla-taller"></tbody>
-    </table>
-  </div>
 
-  <div class="panel">
-    <div class="panel-head">
-      <h2>+ Nuevo material</h2>
-      <span class="dot" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>
+    <div class="panel col-taller">
+      <div class="panel-head">
+        <h2>Materiales de talleres</h2>
+        <span class="dot" style="background:var(--cyan-dim); box-shadow:0 0 8px var(--cyan-dim);"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;">Material</th>
+            <th>Precio</th>
+            <th>Cant.</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tabla-taller"></tbody>
+      </table>
+      <div class="cat-total">
+        <span class="label">Subtotal talleres</span>
+        <span class="value" id="subtotal-taller">$0.00</span>
+      </div>
     </div>
-    <div class="add-grid">
-      <div class="field">
-        <label for="nuevo-nombre">Nombre</label>
-        <input type="text" id="nuevo-nombre" placeholder="Ej: Titanio, Fibra óptica...">
-      </div>
-      <div class="field">
-        <label for="nuevo-precio">Precio</label>
-        <input type="number" id="nuevo-precio" value="8" step="0.5" min="0">
-      </div>
-      <div class="field">
-        <label for="nuevo-categoria">Categoría</label>
-        <select id="nuevo-categoria" onchange="document.getElementById('nuevo-precio').value = categorias[this.value].precioBase">
-          <option value="general">General</option>
-          <option value="taller">Taller</option>
-        </select>
-      </div>
-      <button class="btn btn-add" onclick="agregarMaterial()">+ AÑADIR</button>
-    </div>
+
   </div>
 
   <div class="panel">
     <div class="total-box">
-      <span class="label">Total general</span>
+      <span class="label">Total combinado</span>
       <span class="value" id="total">$0.00</span>
     </div>
   </div>
 
   <button class="btn btn-ghost" onclick="resetear()" style="margin-bottom: 20px;">↺ Restablecer cantidades</button>
 
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Registro en Discord</h2>
-      <span class="dot" style="background:var(--magenta); box-shadow:0 0 8px var(--magenta);"></span>
+  <footer>MAT//CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
+</div>
+
+<!-- ---------- Modal de configuración ---------- -->
+<div class="modal-overlay" id="modal-overlay" onclick="cerrarModalFondo(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Configuración</h2>
+      <button class="modal-close" onclick="cerrarModal()">✕</button>
     </div>
-    <div class="config-body">
-      <div class="field-row">
-        <label for="webhook-url">URL del webhook</label>
-        <input type="password" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
-        <button type="button" class="toggle-visibility" onclick="alternarVisibilidad()">Mostrar</button>
+    <div class="modal-body">
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>+ Nuevo material</h2>
+          <span class="dot" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>
+        </div>
+        <div class="add-grid">
+          <div class="field">
+            <label for="nuevo-nombre">Nombre</label>
+            <input type="text" id="nuevo-nombre" placeholder="Ej: Titanio, Fibra óptica...">
+          </div>
+          <div class="field">
+            <label for="nuevo-precio">Precio</label>
+            <input type="number" id="nuevo-precio" value="8" step="0.5" min="0">
+          </div>
+          <div class="field">
+            <label for="nuevo-categoria">Categoría</label>
+            <select id="nuevo-categoria" onchange="document.getElementById('nuevo-precio').value = categorias[this.value].precioBase">
+              <option value="general">General</option>
+              <option value="taller">Taller</option>
+            </select>
+          </div>
+          <button class="btn btn-add" onclick="agregarMaterial()">+ AÑADIR</button>
+        </div>
       </div>
-      <div class="field-row">
-        <label for="nombre-usuario">Operador (opcional)</label>
-        <input type="text" id="nombre-usuario" placeholder="¿Quién hizo el cálculo?">
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Registro en Discord</h2>
+          <span class="dot" style="background:var(--magenta); box-shadow:0 0 8px var(--magenta);"></span>
+        </div>
+        <div class="config-body">
+          <div class="field-row">
+            <label for="webhook-url">URL del webhook</label>
+            <input type="password" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+            <button type="button" class="toggle-visibility" onclick="alternarVisibilidad()">Mostrar</button>
+          </div>
+          <div class="field-row">
+            <label for="nombre-usuario">Operador (opcional)</label>
+            <input type="text" id="nombre-usuario" placeholder="¿Quién hizo el cálculo?">
+          </div>
+          <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
+          <div class="status-msg" id="status-msg"></div>
+        </div>
       </div>
-      <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
-      <div class="status-msg" id="status-msg"></div>
+
     </div>
   </div>
-
-  <footer>MAT//CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
 </div>
 
 <script src="config.js"></script>
