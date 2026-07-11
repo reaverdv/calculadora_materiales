@@ -74,7 +74,7 @@ function crearFila(catKey, mat, i) {
     <td class="material">${mat.nombre}${mat.personalizado ? '<span class="tag-custom">NUEVO</span>' : ''}</td>
     <td>
       <div class="num-wrap">
-        <input type="number" step="0.01" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular()">
+        <input type="number" step="0.01" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular(); registrarCambioValor('${idPrecio}'); guardarPersonalizados('${catKey}')">
         <div class="spin-btns">
           <button type="button" onclick="cambiar('${idPrecio}', 0.5, '${catKey}')">${flechaArriba}</button>
           <button type="button" onclick="cambiar('${idPrecio}', -0.5, '${catKey}')">${flechaAbajo}</button>
@@ -83,7 +83,7 @@ function crearFila(catKey, mat, i) {
     </td>
     <td>
       <div class="num-wrap">
-        <input type="number" step="1" min="0" value="0" id="${idCant}" onchange="calcular()">
+        <input type="number" step="1" min="0" value="0" id="${idCant}" onchange="calcular(); registrarCambioValor('${idCant}')">
         <div class="spin-btns">
           <button type="button" onclick="cambiar('${idCant}', 1, '${catKey}')">${flechaArriba}</button>
           <button type="button" onclick="cambiar('${idCant}', -1, '${catKey}')">${flechaAbajo}</button>
@@ -158,12 +158,29 @@ function eliminarMaterial(catKey, i) {
 }
 
 // ---------- Cálculo ----------
+function registrarCambioValor(id) {
+  const partes = id.split('-'); // ['precio'|'cant', catKey, i]
+  const tipo = partes[0];
+  const catKey = partes[1];
+  const i = partes[2];
+  const mat = categorias[catKey]?.materiales[i];
+  const input = document.getElementById(id);
+  if (!mat || !input) return;
+  const valor = parseFloat(input.value) || 0;
+  if (tipo === 'precio') {
+    logConsola(`✎ precio de "${mat.nombre}" (${etiquetasCategoria[catKey]}) → $${valor.toFixed(2)}`, 'info');
+  } else {
+    logConsola(`✎ cantidad de "${mat.nombre}" (${etiquetasCategoria[catKey]}) → ${valor}`, 'info');
+  }
+}
+
 function cambiar(id, delta, catKey) {
   const input = document.getElementById(id);
   let valor = (parseFloat(input.value) || 0) + delta;
   if (valor < 0) valor = 0;
   input.value = Number.isInteger(delta) ? valor : valor.toFixed(2);
   calcular();
+  registrarCambioValor(id);
   if (id.startsWith('precio-') && catKey) guardarPersonalizados(catKey);
 }
 
@@ -327,16 +344,42 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') cerrarModal();
 });
 
-// ---------- Consola del sistema ----------
+// ---------- Consola del sistema (con historial persistente) ----------
 const consolaEl = document.getElementById('consola-output');
-function logConsola(mensaje, tipo = '') {
+const MAX_LINEAS_CONSOLA = 300;
+
+function cargarHistorialConsola() {
+  try {
+    const guardado = leer(CONFIG_STORAGE_KEYS.consolaHistorial);
+    return guardado ? JSON.parse(guardado) : [];
+  } catch (e) {
+    return [];
+  }
+}
+let historialConsola = cargarHistorialConsola();
+
+function pintarLineaConsola(hora, mensaje, tipo) {
   if (!consolaEl) return;
-  const hora = new Date().toLocaleTimeString('es-ES', { hour12: false });
   const linea = document.createElement('div');
-  linea.className = `linea ${tipo}`;
+  linea.className = `linea ${tipo || ''}`;
   linea.innerHTML = `<span class="marca-tiempo">[${hora}]</span>${mensaje}`;
   consolaEl.appendChild(linea);
-  consolaEl.scrollTop = consolaEl.scrollHeight;
+}
+
+function logConsola(mensaje, tipo = '') {
+  const hora = new Date().toLocaleTimeString('es-ES', { hour12: false });
+  historialConsola.push({ hora, mensaje, tipo });
+  if (historialConsola.length > MAX_LINEAS_CONSOLA) {
+    historialConsola = historialConsola.slice(-MAX_LINEAS_CONSOLA);
+  }
+  guardar(CONFIG_STORAGE_KEYS.consolaHistorial, JSON.stringify(historialConsola));
+  pintarLineaConsola(hora, mensaje, tipo);
+  if (consolaEl) consolaEl.scrollTop = consolaEl.scrollHeight;
+}
+
+function restaurarConsola() {
+  historialConsola.forEach(entry => pintarLineaConsola(entry.hora, entry.mensaje, entry.tipo));
+  if (consolaEl) consolaEl.scrollTop = consolaEl.scrollHeight;
 }
 
 // ---------- Bloqueo de clic derecho ----------
@@ -364,11 +407,13 @@ function inicializarCursor() {
   document.addEventListener('mouseover', (e) => {
     if (e.target.closest(selectorInteractivo)) {
       cursor.classList.add('activo');
+      cursor.textContent = '🪛';
     }
   });
   document.addEventListener('mouseout', (e) => {
     if (e.target.closest(selectorInteractivo)) {
       cursor.classList.remove('activo');
+      cursor.textContent = '🔧';
     }
   });
 }
@@ -378,6 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTodo();
   inicializarDiscord();
   inicializarCursor();
-  logConsola('sistema REAVER MATERIALES iniciado.');
-  logConsola('inventario cargado correctamente.');
+  restaurarConsola();
+  logConsola('sesión iniciada — sistema REAVER MATERIALES.');
 });
