@@ -159,6 +159,35 @@ h1 {
 }
 .columnas .panel { margin-bottom: 0; }
 
+/* Tabla compacta para que las 5 columnas entren en el ancho reducido */
+.columnas table { table-layout: fixed; }
+.columnas th, .columnas td {
+  padding: 8px 5px;
+  font-size: 12px;
+  overflow: hidden;
+}
+.columnas td.material {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.columnas .num-wrap {
+  display: flex;
+  width: 100%;
+}
+.columnas .num-wrap input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  padding: 5px 2px;
+  font-size: 11.5px;
+}
+.columnas .spin-btns { flex-shrink: 0; }
+.columnas .spin-btns button { width: 15px; height: 13px; }
+.columnas .spin-btns svg { width: 7px; height: 7px; }
+.columnas .subtotal { font-size: 11.5px; padding: 8px 3px; }
+.columnas .del-row { width: 18px; height: 18px; font-size: 10px; }
+.columnas td.material .tag-custom { display: block; margin: 3px 0 0; width: fit-content; }
+
 .cat-total {
   display: flex;
   justify-content: space-between;
