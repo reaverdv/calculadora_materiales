@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REAVER MAT//CALC</title>
+<title>REAVER MAT // CALC — Terminal de Tasación</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -14,7 +14,7 @@
 
   <header>
     <div class="eyebrow">SISTEMA DE TASACIÓN DE CHATARRA</div>
-    <h1>REAVER MAT//CALC</h1>
+    <h1>REAVER MAT // CALC</h1>
     <div class="subtitle">&gt; escaneando inventario de materiales<span class="cursor"></span></div>
     <button class="btn btn-config" onclick="abrirModal()">⚙ CONFIGURACIÓN</button>
   </header>
@@ -92,7 +92,14 @@
 
   <button class="btn btn-ghost" onclick="resetear()" style="margin-bottom: 20px;">↺ Restablecer cantidades</button>
 
-  <footer>REAVER MAT//CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
+  <div class="panel">
+    <div class="config-body">
+      <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <footer>REAVER MAT // CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
 </div>
 
 <!-- ---------- Modal de configuración ---------- -->
@@ -144,8 +151,6 @@
             <label for="nombre-usuario">Operador (opcional)</label>
             <input type="text" id="nombre-usuario" placeholder="¿Quién hizo el cálculo?">
           </div>
-          <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
-          <div class="status-msg" id="status-msg"></div>
         </div>
       </div>
 
