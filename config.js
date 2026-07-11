@@ -14,7 +14,7 @@ const CONFIG_MATERIALES = {
       "Cobre",
       "Latón",
       "Tequila",
-      "Pólvora",
+     //  "Pólvora",
       "Madera",
       "Piezas de electrónica",
       "Chatarra electrónica",
