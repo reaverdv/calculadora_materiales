@@ -145,8 +145,15 @@ h1 span.accent { color: var(--cyan); }
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
-.lista-materiales { padding: 2px 0; }
+.lista-materiales {
+  padding: 2px 0;
+  column-width: 230px;
+  column-gap: 0;
+  column-rule: 1px solid var(--border);
+}
 .fila-material {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
   padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   transition: background 0.15s ease;
