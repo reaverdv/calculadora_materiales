@@ -60,11 +60,15 @@ function inicializarMateriales(catKey) {
 inicializarMateriales('general');
 inicializarMateriales('taller');
 
-// ---------- Iconos de flechas para los spinners ----------
-const flechaArriba = `<svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const flechaAbajo = `<svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
 // ---------- Renderizado de tablas ----------
+function crearChipsPrecio(catKey, i, precioActual) {
+  const botones = CONFIG_PRECIOS_BOTONES.map(p => {
+    const activo = Number(precioActual) === p ? ' activo' : '';
+    return `<button type="button" class="chip-precio${activo}" data-valor="${p}" onclick="setPrecio('${catKey}', ${i}, ${p})">$${p}</button>`;
+  }).join('');
+  return `<div class="precio-chips" id="chips-precio-${catKey}-${i}">${botones}</div>`;
+}
+
 function crearFila(catKey, mat, i) {
   const tr = document.createElement('tr');
   const idPrecio = `precio-${catKey}-${i}`;
@@ -73,27 +77,50 @@ function crearFila(catKey, mat, i) {
   tr.innerHTML = `
     <td class="material">${mat.nombre}${mat.personalizado ? '<span class="tag-custom">NUEVO</span>' : ''}</td>
     <td>
-      <div class="num-wrap">
-        <input type="number" step="0.01" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular(); registrarCambioValor('${idPrecio}'); guardarPersonalizados('${catKey}')">
-        <div class="spin-btns">
-          <button type="button" onclick="cambiar('${idPrecio}', 0.5, '${catKey}')">${flechaArriba}</button>
-          <button type="button" onclick="cambiar('${idPrecio}', -0.5, '${catKey}')">${flechaAbajo}</button>
-        </div>
+      ${crearChipsPrecio(catKey, i, mat.precioInicial)}
+      <div class="precio-otro">
+        <span>Otro:</span>
+        <input type="number" step="0.5" min="0" value="${mat.precioInicial}" id="${idPrecio}" onchange="calcular(); registrarCambioValor('${idPrecio}'); guardarPersonalizados('${catKey}'); actualizarChipsActivos('${catKey}', ${i})">
       </div>
     </td>
     <td>
-      <div class="num-wrap">
+      <div class="cant-wrap">
+        <button type="button" class="qty-btn qty-minus" onclick="cambiar('${idCant}', -1, '${catKey}')" aria-label="Restar uno">−</button>
         <input type="number" step="1" min="0" value="0" id="${idCant}" onchange="calcular(); registrarCambioValor('${idCant}')">
-        <div class="spin-btns">
-          <button type="button" onclick="cambiar('${idCant}', 1, '${catKey}')">${flechaArriba}</button>
-          <button type="button" onclick="cambiar('${idCant}', -1, '${catKey}')">${flechaAbajo}</button>
-        </div>
+        <button type="button" class="qty-btn qty-plus" onclick="cambiar('${idCant}', 1, '${catKey}')" aria-label="Sumar uno">+</button>
+      </div>
+      <div class="qty-quick">
+        <button type="button" onclick="cambiar('${idCant}', 5, '${catKey}')">+5</button>
+        <button type="button" onclick="cambiar('${idCant}', 10, '${catKey}')">+10</button>
+        <button type="button" onclick="cambiar('${idCant}', 25, '${catKey}')">+25</button>
       </div>
     </td>
     <td class="subtotal" id="${idSub}">$0.00</td>
     <td>${mat.personalizado ? `<button class="del-row" onclick="eliminarMaterial('${catKey}', ${i})">✕</button>` : ''}</td>
   `;
   return tr;
+}
+
+function setPrecio(catKey, i, valor) {
+  const idPrecio = `precio-${catKey}-${i}`;
+  const input = document.getElementById(idPrecio);
+  if (!input) return;
+  input.value = valor;
+  actualizarChipsActivos(catKey, i);
+  calcular();
+  registrarCambioValor(idPrecio);
+  guardarPersonalizados(catKey);
+}
+
+function actualizarChipsActivos(catKey, i) {
+  const idPrecio = `precio-${catKey}-${i}`;
+  const input = document.getElementById(idPrecio);
+  const contenedor = document.getElementById(`chips-precio-${catKey}-${i}`);
+  if (!input || !contenedor) return;
+  const valorActual = parseFloat(input.value);
+  contenedor.querySelectorAll('.chip-precio').forEach(chip => {
+    chip.classList.toggle('activo', parseFloat(chip.dataset.valor) === valorActual);
+  });
 }
 
 function renderTabla(catKey) {
@@ -388,41 +415,10 @@ document.addEventListener('contextmenu', (e) => {
   logConsola('⚠ intento de clic derecho bloqueado.', 'err');
 });
 
-// ---------- Cursor personalizado: llave inglesa ----------
-function inicializarCursor() {
-  if (window.matchMedia('(pointer: coarse)').matches) return; // sin cursor custom en táctil
-
-  const cursor = document.createElement('div');
-  cursor.id = 'custom-cursor';
-  cursor.textContent = '🔧';
-  document.body.appendChild(cursor);
-
-  document.addEventListener('mousemove', (e) => {
-    cursor.style.left = `${e.clientX}px`;
-    cursor.style.top = `${e.clientY}px`;
-  });
-
-  const selectorInteractivo = 'button, a, input, select, .btn, [onclick]';
-
-  document.addEventListener('mouseover', (e) => {
-    if (e.target.closest(selectorInteractivo)) {
-      cursor.classList.add('activo');
-      cursor.textContent = '🪛';
-    }
-  });
-  document.addEventListener('mouseout', (e) => {
-    if (e.target.closest(selectorInteractivo)) {
-      cursor.classList.remove('activo');
-      cursor.textContent = '🔧';
-    }
-  });
-}
-
 // ---------- Inicialización ----------
 document.addEventListener('DOMContentLoaded', () => {
   renderTodo();
   inicializarDiscord();
-  inicializarCursor();
   restaurarConsola();
   logConsola('sesión iniciada — sistema REAVER MATERIALES.');
 });

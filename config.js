@@ -37,6 +37,10 @@ const CONFIG_MATERIALES = {
   }
 };
 
+// Botones de precio predefinidos que aparecen en cada fila.
+// Agregá o quitá valores de esta lista para cambiar los botones.
+const CONFIG_PRECIOS_BOTONES = [4, 5, 6, 8, 10, 12];
+
 const CONFIG_DISCORD = {
   webhookPlaceholder: "https://discord.com/api/webhooks/...",
   nombreUsuarioPlaceholder: "¿Quién hizo el cálculo?",
