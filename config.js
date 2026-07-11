@@ -50,6 +50,8 @@ const CONFIG_DISCORD = {
 const CONFIG_STORAGE_KEYS = {
   personalizadosGeneral: "materiales-personalizados-general",
   personalizadosTaller: "materiales-personalizados-taller",
+  estadoGeneral: "materiales-estado-general",
+  estadoTaller: "materiales-estado-taller",
   webhookUrl: "discord-webhook-url",
   nombreUsuario: "discord-nombre-usuario",
   consolaHistorial: "consola-historial"

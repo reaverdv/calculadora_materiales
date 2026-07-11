@@ -712,6 +712,7 @@ footer {
   margin-bottom: 20px;
 }
 .acciones-fila .btn-ghost { margin: 0; }
+.btn-ghost-danger:hover { border-color: var(--danger); color: var(--danger); }
 
 /* --- Textareas para JSON --- */
 .modal-texto {

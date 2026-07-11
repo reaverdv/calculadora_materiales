@@ -35,12 +35,14 @@ const categorias = {
   general: {
     precioBase: CONFIG_MATERIALES.general.precioBase,
     storageKey: CONFIG_STORAGE_KEYS.personalizadosGeneral,
+    storageKeyEstado: CONFIG_STORAGE_KEYS.estadoGeneral,
     tbodyId: 'tabla-general',
     materiales: []
   },
   taller: {
     precioBase: CONFIG_MATERIALES.taller.precioBase,
     storageKey: CONFIG_STORAGE_KEYS.personalizadosTaller,
+    storageKeyEstado: CONFIG_STORAGE_KEYS.estadoTaller,
     tbodyId: 'tabla-taller',
     materiales: []
   }
@@ -141,9 +143,40 @@ function renderTabla(catKey) {
   cat.materiales.forEach((mat, i) => tbody.appendChild(crearFila(catKey, mat, i)));
 }
 
+function cargarEstadoGuardado(catKey) {
+  try {
+    const raw = leer(categorias[catKey].storageKeyEstado);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function restaurarEstado(catKey) {
+  const cat = categorias[catKey];
+  const guardado = cargarEstadoGuardado(catKey);
+  cat.materiales.forEach((mat, i) => {
+    const datos = guardado[mat.nombre];
+    if (!datos) return;
+    const precioEl = document.getElementById(`precio-${catKey}-${i}`);
+    const cantEl = document.getElementById(`cant-${catKey}-${i}`);
+    const precio = parseFloat(datos.precio);
+    const cantidad = parseFloat(datos.cantidad);
+    if (precioEl && !isNaN(precio)) {
+      precioEl.value = precio;
+      actualizarChipsActivos(catKey, i);
+    }
+    if (cantEl && !isNaN(cantidad)) {
+      cantEl.value = cantidad;
+    }
+  });
+}
+
 function renderTodo() {
   renderTabla('general');
   renderTabla('taller');
+  restaurarEstado('general');
+  restaurarEstado('taller');
   calcular();
 }
 
@@ -227,12 +260,14 @@ function calcular() {
   Object.keys(categorias).forEach(catKey => {
     const cat = categorias[catKey];
     let subtotalCategoria = 0;
-    cat.materiales.forEach((_, i) => {
+    const estado = {};
+    cat.materiales.forEach((mat, i) => {
       const precioEl = document.getElementById(`precio-${catKey}-${i}`);
       const cantEl = document.getElementById(`cant-${catKey}-${i}`);
       if (!precioEl || !cantEl) return;
       const precio = parseFloat(precioEl.value) || 0;
       const cantidad = parseFloat(cantEl.value) || 0;
+      estado[mat.nombre] = { precio, cantidad };
       const subtotal = precio * cantidad;
       subtotalCategoria += subtotal;
       total += subtotal;
@@ -241,6 +276,7 @@ function calcular() {
     });
     const subtotalCatEl = document.getElementById(`subtotal-${catKey}`);
     if (subtotalCatEl) subtotalCatEl.textContent = `$${subtotalCategoria.toFixed(2)}`;
+    guardar(cat.storageKeyEstado, JSON.stringify(estado));
   });
   document.getElementById('total').textContent = `$${total.toFixed(2)}`;
   actualizarResumen();
@@ -296,8 +332,29 @@ function resetear() {
       if (cantEl) cantEl.value = 0;
     });
   });
-  calcular();
+  calcular(); // recalcula y guarda el estado (cantidades en 0) en localStorage
   logConsola('↺ cantidades restablecidas a cero.');
+}
+
+function limpiarTablas() {
+  const confirmado = confirm('¿Limpiar las tablas? Se pondrán todas las cantidades en 0 y los precios volverán a su valor por defecto. Esto también borra lo guardado en este navegador.');
+  if (!confirmado) return;
+
+  Object.keys(categorias).forEach(catKey => {
+    const cat = categorias[catKey];
+    cat.materiales.forEach((mat, i) => {
+      const precioEl = document.getElementById(`precio-${catKey}-${i}`);
+      const cantEl = document.getElementById(`cant-${catKey}-${i}`);
+      if (cantEl) cantEl.value = 0;
+      if (precioEl) {
+        precioEl.value = mat.precioInicial;
+        actualizarChipsActivos(catKey, i);
+      }
+    });
+  });
+
+  calcular(); // vuelve a guardar el estado, ya limpio, en localStorage
+  logConsola('🗑 tablas limpiadas — cantidades y precios restablecidos.', 'err');
 }
 
 // ---------- Discord ----------
