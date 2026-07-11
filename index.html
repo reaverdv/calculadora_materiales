@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAT//CALC — Terminal de Tasación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070a;
+    --bg-panel: rgba(9, 16, 22, 0.82);
+    --grid-line: rgba(0, 255, 220, 0.06);
+    --cyan: #00fff2;
+    --cyan-dim: #0a5c58;
+    --magenta: #ff2bd6;
+    --amber: #ffb000;
+    --text: #d6fbff;
+    --muted: #5f8a90;
+    --border: #113338;
+    --danger: #ff4d5e;
+    --ok: #4dffa0;
+  }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  body {
+    padding: 28px 16px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+  /* Fondo de rejilla animada */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    animation: gridMove 14s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Resplandor ambiental */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: -20%;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(0,255,242,0.10), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(255,43,214,0.10), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 42px 42px, 42px 42px; }
+  }
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+    mix-blend-mode: overlay;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Encabezado --- */
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    opacity: 0.75;
+  }
+  .eyebrow::before { content: '// '; }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 6vw, 42px);
+    letter-spacing: 2px;
+    margin: 6px 0 8px;
+    color: var(--text);
+    text-shadow:
+      0 0 6px var(--cyan),
+      0 0 18px rgba(0,255,242,0.5),
+      2px 0 0 rgba(255,43,214,0.4),
+      -2px 0 0 rgba(0,255,242,0.4);
+    animation: flicker 6s infinite;
+  }
+  @keyframes flicker {
+    0%, 92%, 100% { opacity: 1; }
+    93% { opacity: 0.55; }
+    94% { opacity: 1; }
+    95% { opacity: 0.7; }
+    96% { opacity: 1; }
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .subtitle .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 13px;
+    background: var(--cyan);
+    margin-left: 4px;
+    animation: blink 1s steps(1) infinite;
+    vertical-align: middle;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* --- Paneles --- */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 0 1px rgba(0,255,242,0.05), 0 8px 30px rgba(0,0,0,0.5);
+    position: relative;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.6;
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,255,242,0.03);
+  }
+  .panel-head h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .panel-head .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+  }
+
+  /* --- Tabla --- */
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    padding: 11px 12px;
+    text-align: center;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  tbody tr { transition: background 0.2s ease; }
+  tbody tr:hover { background: rgba(0,255,242,0.045); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.material {
+    text-align: left;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  td.material .tag-custom {
+    font-size: 9px;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    border-radius: 3px;
+    padding: 1px 4px;
+    margin-left: 6px;
+    letter-spacing: 1px;
+    vertical-align: middle;
+  }
+  .subtotal {
+    color: var(--cyan);
+    font-variant-numeric: tabular-nums;
+  }
+  .del-row {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    width: 22px; height: 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    transition: all 0.15s ease;
+  }
+  .del-row:hover { background: var(--danger); color: #05070a; box-shadow: 0 0 10px var(--danger); }
+
+  /* --- Inputs numéricos --- */
+  input {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text);
+    background: rgba(0,0,0,0.35);
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  .num-wrap {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .num-wrap:focus-within {
+    border-color: var(--cyan);
+    box-shadow: 0 0 8px rgba(0,255,242,0.35);
+  }
+  .num-wrap input {
+    border: none;
+    width: 62px;
+    padding: 6px 4px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .num-wrap input:focus { outline: none; }
+  .spin-btns { display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+  .spin-btns button {
+    border: none;
+    background: rgba(0,255,242,0.06);
+    color: var(--cyan);
+    width: 20px; height: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: background 0.15s ease;
+  }
+  .spin-btns button:first-child { border-bottom: 1px solid var(--border); }
+  .spin-btns button:hover { background: var(--cyan); color: #05070a; }
+  .spin-btns svg { width: 8px; height: 8px; pointer-events: none; }
+
+  /* --- Total --- */
+  .total-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+  }
+  .total-box .label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .total-box .value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--magenta);
+    text-shadow: 0 0 10px rgba(255,43,214,0.7), 0 0 24px rgba(255,43,214,0.35);
+    font-variant-numeric: tabular-nums;
+    transition: text-shadow 0.15s ease;
+  }
+
+  /* --- Botones generales --- */
+  .btn {
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 13px;
+  }
+  .btn-ghost {
+    display: block;
+    margin: 0 auto;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 9px 18px;
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0,255,242,0.25); }
+
+  .btn-neon {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    padding: 12px 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .btn-neon:hover {
+    background: rgba(0,255,242,0.1);
+    box-shadow: 0 0 16px rgba(0,255,242,0.5), inset 0 0 12px rgba(0,255,242,0.15);
+  }
+  .btn-neon:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-magenta {
+    border-color: var(--magenta);
+    color: var(--magenta);
+  }
+  .btn-magenta:hover {
+    background: rgba(255,43,214,0.1);
+    box-shadow: 0 0 16px rgba(255,43,214,0.5), inset 0 0 12px rgba(255,43,214,0.15);
+  }
+
+  /* --- Panel de añadir material --- */
+  .add-grid {
+    display: grid;
+    grid-template-columns: 1fr 110px auto;
+    gap: 10px;
+    padding: 16px;
+    align-items: end;
+  }
+  @media (max-width: 480px) {
+    .add-grid { grid-template-columns: 1fr; }
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .field input[type=text], .field input[type=number] {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: rgba(0,0,0,0.35);
+    font-size: 13px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--amber);
+    box-shadow: 0 0 8px rgba(255,176,0,0.35);
+  }
+  .btn-add {
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    padding: 9px 16px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .btn-add:hover {
+    background: rgba(255,176,0,0.12);
+    box-shadow: 0 0 14px rgba(255,176,0,0.45);
+  }
+
+  /* --- Config Discord --- */
+  .config-body { padding: 16px; }
+  .field-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field-row label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+  .field-row input[type=text], .field-row input[type=password] {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: rgba(0,0,0,0.35);
+    color: var(--text);
+    font-size: 13px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field-row input:focus {
+    outline: none;
+    border-color: var(--magenta);
+    box-shadow: 0 0 8px rgba(255,43,214,0.35);
+  }
+  .toggle-visibility {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-align: right;
+    padding: 3px 0 0 0;
+    text-transform: uppercase;
+  }
+  .toggle-visibility:hover { color: var(--cyan); }
+
+  .status-msg {
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 16px;
+    letter-spacing: 0.5px;
+  }
+  .status-msg.ok { color: var(--ok); text-shadow: 0 0 6px rgba(77,255,160,0.5); }
+  .status-msg.err { color: var(--danger); text-shadow: 0 0 6px rgba(255,77,94,0.5); }
+  .status-msg.loading { color: var(--muted); }
+
+  footer {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-top: 30px;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="container">
+
+  <header>
+    <div class="eyebrow">SISTEMA DE TASACIÓN DE CHATARRA</div>
+    <h1>MAT // CALC</h1>
+    <div class="subtitle">&gt; escaneando inventario de materiales<span class="cursor"></span></div>
+  </header>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Inventario</h2>
+      <span class="dot"></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left;">Material</th>
+          <th>Precio</th>
+          <th>Cant.</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tabla-materiales"></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>+ Nuevo material</h2>
+      <span class="dot" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>
+    </div>
+    <div class="add-grid">
+      <div class="field">
+        <label for="nuevo-nombre">Nombre</label>
+        <input type="text" id="nuevo-nombre" placeholder="Ej: Titanio, Fibra óptica...">
+      </div>
+      <div class="field">
+        <label for="nuevo-precio">Precio</label>
+        <input type="number" id="nuevo-precio" value="8" step="0.5" min="0">
+      </div>
+      <button class="btn btn-add" onclick="agregarMaterial()">+ AÑADIR</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="total-box">
+      <span class="label">Total general</span>
+      <span class="value" id="total">$0.00</span>
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" onclick="resetear()" style="margin-bottom: 20px;">↺ Restablecer cantidades</button>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Registro en Discord</h2>
+      <span class="dot" style="background:var(--magenta); box-shadow:0 0 8px var(--magenta);"></span>
+    </div>
+    <div class="config-body">
+      <div class="field-row">
+        <label for="webhook-url">URL del webhook</label>
+        <input type="password" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+        <button type="button" class="toggle-visibility" onclick="alternarVisibilidad()">Mostrar</button>
+      </div>
+      <div class="field-row">
+        <label for="nombre-usuario">Operador (opcional)</label>
+        <input type="text" id="nombre-usuario" placeholder="¿Quién hizo el cálculo?">
+      </div>
+      <button class="btn btn-neon btn-magenta" id="btn-registrar" onclick="registrarEnDiscord()">▲ TRANSMITIR A DISCORD</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <footer>MAT//CALC — TERMINAL LOCAL — SIN CONEXIÓN A SERVIDORES EXTERNOS SALVO DISCORD</footer>
+</div>
+
+<script>
+  // ---------- Almacenamiento con respaldo ----------
+  // Intenta localStorage (funciona si abrís el archivo directo en tu navegador).
+  // Si falla (p. ej. dentro de la vista previa de Claude.ai), usa memoria de sesión.
+  const memoria = {};
+  function guardar(clave, valor) {
+    try { localStorage.setItem(clave, valor); }
+    catch (e) { memoria[clave] = valor; }
+  }
+  function leer(clave) {
+    try {
+      const v = localStorage.getItem(clave);
+      if (v !== null) return v;
+    } catch (e) { /* no disponible */ }
+    return memoria[clave] !== undefined ? memoria[clave] : null;
+  }
+
+  // ---------- Datos de materiales ----------
+  const materialesFijos = [
+    "Goma", "Plástico", "Cobre", "Latón", "Tequila", "Pólvora",
+    "Madera", "Piezas de electrónica", "Chatarra electrónica", "Acero", "Aluminio"
+  ].map(nombre => ({ nombre, personalizado: false }));
+
+  let materialesPersonalizados = [];
+  try {
+    const guardados = leer('materiales-personalizados');
+    if (guardados) materialesPersonalizados = JSON.parse(guardados);
+  } catch (e) { materialesPersonalizados = []; }
+
+  let materiales = [...materialesFijos, ...materialesPersonalizados.map(m => ({ nombre: m.nombre, personalizado: true, precioInicial: m.precio }))];
+
+  const flechaArriba = `<svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const flechaAbajo = `<svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const tbody = document.getElementById('tabla-materiales');
+
+  function crearFila(mat, i) {
+    const tr = document.createElement('tr');
+    tr.dataset.index = i;
+    const precioDefault = mat.precioInicial !== undefined ? mat.precioInicial : 8;
+    tr.innerHTML = `
+      <td class="material">${mat.nombre}${mat.personalizado ? '<span class="tag-custom">NUEVO</span>' : ''}</td>
+      <td>
+        <div class="num-wrap">
+          <input type="number" step="0.01" min="0" value="${precioDefault}" id="precio-${i}" onchange="calcular()">
+          <div class="spin-btns">
+            <button type="button" onclick="cambiar('precio-${i}', 0.5)">${flechaArriba}</button>
+            <button type="button" onclick="cambiar('precio-${i}', -0.5)">${flechaAbajo}</button>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="num-wrap">
+          <input type="number" step="1" min="0" value="0" id="cant-${i}" onchange="calcular()">
+          <div class="spin-btns">
+            <button type="button" onclick="cambiar('cant-${i}', 1)">${flechaArriba}</button>
+            <button type="button" onclick="cambiar('cant-${i}', -1)">${flechaAbajo}</button>
+          </div>
+        </div>
+      </td>
+      <td class="subtotal" id="sub-${i}">$0.00</td>
+      <td>${mat.personalizado ? `<button class="del-row" onclick="eliminarMaterial(${i})">✕</button>` : ''}</td>
+    `;
+    return tr;
+  }
+
+  function renderTabla() {
+    tbody.innerHTML = '';
+    materiales.forEach((mat, i) => tbody.appendChild(crearFila(mat, i)));
+    calcular();
+  }
+
+  function guardarPersonalizados() {
+    const datos = materiales
+      .filter(m => m.personalizado)
+      .map((m, idx) => {
+        const i = materiales.indexOf(m);
+        const precio = parseFloat(document.getElementById(`precio-${i}`)?.value) || 8;
+        return { nombre: m.nombre, precio };
+      });
+    guardar('materiales-personalizados', JSON.stringify(datos));
+  }
+
+  function agregarMaterial() {
+    const nombreInput = document.getElementById('nuevo-nombre');
+    const precioInput = document.getElementById('nuevo-precio');
+    const nombre = nombreInput.value.trim();
+    const precio = parseFloat(precioInput.value) || 0;
+
+    if (!nombre) {
+      nombreInput.style.borderColor = 'var(--danger)';
+      nombreInput.placeholder = '⚠ Escribí un nombre primero';
+      setTimeout(() => { nombreInput.style.borderColor = ''; nombreInput.placeholder = 'Ej: Titanio, Fibra óptica...'; }, 1800);
+      return;
+    }
+
+    materiales.push({ nombre, personalizado: true, precioInicial: precio });
+    renderTabla();
+    guardarPersonalizados();
+
+    nombreInput.value = '';
+    precioInput.value = 8;
+    nombreInput.focus();
+  }
+
+  function eliminarMaterial(i) {
+    materiales[i] = null;
+    materiales = materiales.filter(m => m !== null);
+    renderTabla();
+    guardarPersonalizados();
+  }
+
+  function cambiar(id, delta) {
+    const input = document.getElementById(id);
+    let valor = (parseFloat(input.value) || 0) + delta;
+    if (valor < 0) valor = 0;
+    input.value = Number.isInteger(delta) ? valor : valor.toFixed(2);
+    calcular();
+    if (id.startsWith('precio-')) guardarPersonalizados();
+  }
+
+  function calcular() {
+    let total = 0;
+    materiales.forEach((_, i) => {
+      const precioEl = document.getElementById(`precio-${i}`);
+      const cantEl = document.getElementById(`cant-${i}`);
+      if (!precioEl || !cantEl) return;
+      const precio = parseFloat(precioEl.value) || 0;
+      const cantidad = parseFloat(cantEl.value) || 0;
+      const subtotal = precio * cantidad;
+      total += subtotal;
+      document.getElementById(`sub-${i}`).textContent = `$${subtotal.toFixed(2)}`;
+    });
+    document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+  }
+
+  function resetear() {
+    materiales.forEach((_, i) => {
+      const cantEl = document.getElementById(`cant-${i}`);
+      if (cantEl) cantEl.value = 0;
+    });
+    calcular();
+  }
+
+  // ---------- Discord ----------
+  const webhookInput = document.getElementById('webhook-url');
+  const nombreInput = document.getElementById('nombre-usuario');
+  webhookInput.value = leer('discord-webhook-url') || '';
+  nombreInput.value = leer('discord-nombre-usuario') || '';
+
+  webhookInput.addEventListener('change', () => guardar('discord-webhook-url', webhookInput.value.trim()));
+  nombreInput.addEventListener('change', () => guardar('discord-nombre-usuario', nombreInput.value.trim()));
+
+  function alternarVisibilidad() {
+    const btn = document.querySelector('.toggle-visibility');
+    if (webhookInput.type === 'password') {
+      webhookInput.type = 'text';
+      btn.textContent = 'Ocultar';
+    } else {
+      webhookInput.type = 'password';
+      btn.textContent = 'Mostrar';
+    }
+  }
+
+  function mostrarEstado(mensaje, tipo) {
+    const el = document.getElementById('status-msg');
+    el.textContent = mensaje;
+    el.className = `status-msg ${tipo}`;
+  }
+
+  async function registrarEnDiscord() {
+    const url = webhookInput.value.trim();
+    guardar('discord-webhook-url', url);
+    guardar('discord-nombre-usuario', nombreInput.value.trim());
+
+    if (!url) {
+      mostrarEstado('⚠ Poné la URL del webhook primero.', 'err');
+      return;
+    }
+
+    const nombre = nombreInput.value.trim();
+    let total = 0;
+    const campos = [];
+
+    materiales.forEach((mat, i) => {
+      const precio = parseFloat(document.getElementById(`precio-${i}`)?.value) || 0;
+      const cantidad = parseFloat(document.getElementById(`cant-${i}`)?.value) || 0;
+      const subtotal = precio * cantidad;
+      total += subtotal;
+      if (cantidad > 0) {
+        campos.push({
+          name: mat.nombre,
+          value: `Cantidad: ${cantidad} · Precio unit: $${precio.toFixed(2)} · Subtotal: **$${subtotal.toFixed(2)}**`,
+          inline: false
+        });
+      }
+    });
+
+    if (campos.length === 0) {
+      mostrarEstado('⚠ No hay cantidades cargadas para registrar.', 'err');
+      return;
+    }
+
+    const payload = {
+      username: 'MAT//CALC',
+      embeds: [{
+        title: '🧾 REGISTRO DE MATERIALES',
+        color: 65522,
+        fields: campos,
+        footer: { text: `Operador: ${nombre || 'Anónimo'}` },
+        timestamp: new Date().toISOString()
+      }],
+      content: `**TOTAL GENERAL: $${total.toFixed(2)}**`
+    };
+
+    const btn = document.getElementById('btn-registrar');
+    btn.disabled = true;
+    mostrarEstado('▸ transmitiendo...', 'loading');
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        mostrarEstado('✔ registrado correctamente en discord.', 'ok');
+      } else {
+        mostrarEstado(`✕ discord respondió con error (${res.status}). revisá la url.`, 'err');
+      }
+    } catch (e) {
+      mostrarEstado('✕ no se pudo conectar. revisá la url o tu conexión.', 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  renderTabla();
+</script>
+</body>
+</html>
